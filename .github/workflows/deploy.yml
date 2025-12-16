@@ -1,0 +1,33 @@
+name: Deploy Hugo site to Pages
+
+on:
+  push:
+    branches: ["main"]
+    paths-ignore:
+      - 'README.md'
+      - '.gitignore'
+  workflow_dispatch:
+    inputs:
+      callbackUrl:
+        description: 'Callback URL for deployment status'
+        required: false
+        type: string
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+env:
+  HUGO_ENV: production
+
+jobs:
+  deploy:
+    uses: vovanukas/doks-core/.github/workflows/deploy.yml@main
+    secrets:
+      CONVEX_SITE_URL: ${{ secrets.CONVEX_SITE_URL }}
+      CALLBACK_BEARER: ${{ secrets.CALLBACK_BEARER }}
